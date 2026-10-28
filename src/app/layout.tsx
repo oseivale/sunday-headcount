@@ -1,10 +1,12 @@
 import type { Metadata, Viewport } from 'next'
-import { Montserrat, Source_Sans_3 } from 'next/font/google'
+// Fonts are bundled from npm (Fontsource) and served from this site,
+// so the build never has to download them from Google.
+import '@fontsource/montserrat/600.css'
+import '@fontsource/montserrat/700.css'
+import '@fontsource/source-sans-3/400.css'
+import '@fontsource/source-sans-3/600.css'
+import '@fontsource/source-sans-3/700.css'
 import './globals.css'
-
-// Montserrat for headings and the brand name; Source Sans 3 for reading text and numbers (even-width digits).
-const display = Montserrat({ subsets: ['latin'], weight: ['600', '700'], variable: '--font-display' })
-const body = Source_Sans_3({ subsets: ['latin'], weight: ['400', '600', '700'], variable: '--font-body' })
 
 export const metadata: Metadata = {
   title: 'Sunday Headcount',
@@ -23,7 +25,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en-CA" className={`${body.variable} ${display.variable}`}>
+    <html lang="en-CA">
       <body>{children}</body>
     </html>
   )

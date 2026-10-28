@@ -10,9 +10,9 @@
   --good: #2C7A4C; --bad: #B23A3A; --good-soft: #E2F1E7; --bad-soft: #F8E3E3;
   --hl: #F3DE8F; --hl-ink: #1F2321;
   --c1: #1F4D2B; --c2: #D9B959; --c3: #B9B5AA; --c4: #9C7A22;
-  --display: var(--font-display), "Montserrat", "Segoe UI", system-ui, sans-serif;
-  --body: var(--font-body), "Source Sans 3", system-ui, -apple-system, "Segoe UI", sans-serif;
-  --mono: var(--font-body), "Source Sans 3", system-ui, sans-serif;
+  --display: "Montserrat", "Segoe UI", system-ui, sans-serif;
+  --body: "Source Sans 3", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "Source Sans 3", system-ui, sans-serif;
   color-scheme: light;
 }
 @media (prefers-color-scheme: dark) {

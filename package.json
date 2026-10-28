@@ -9,6 +9,8 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@fontsource/montserrat": "^5.2.5",
+    "@fontsource/source-sans-3": "^5.2.5",
     "@supabase/ssr": "^0.6.1",
     "@supabase/supabase-js": "^2.49.4",
     "jspdf": "^2.5.2",
