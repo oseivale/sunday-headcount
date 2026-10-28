@@ -73,7 +73,7 @@ export function SundayForm({ date, existing, recent, canEdit }: Props) {
               <label htmlFor="sd"><h3>Date</h3></label>
               {existing ? <span className="pill ok">Saved</span> : <span className="pill warn">Not entered yet</span>}
             </div>
-            <input type="date" id="sd" value={date} style={{ marginTop: 8, width: '100%' }} onChange={(e) => e.target.value && router.push(`/sunday?date=${e.target.value}`)} />
+            <input type="date" id="sd" className="datefield" value={date} onChange={(e) => e.target.value && router.push(`/sunday?date=${e.target.value}`)} />
             {D(date).getUTCDay() !== 0 && <p className="hint">This date is not a Sunday. That is fine for a special service.</p>}
           </div>
 
@@ -97,11 +97,11 @@ export function SundayForm({ date, existing, recent, canEdit }: Props) {
             <h2>Offerings</h2>
             <div className="grow">
               <label htmlFor="in-o1">1st Offering</label>
-              <div className="money"><span>CAD $</span><input id="in-o1" type="number" inputMode="decimal" min={0} step="0.01" placeholder="0.00" value={o1} disabled={!canEdit} onChange={(e) => setOffering('offering_1', e.target.value)} /></div>
+              <div className="money"><span aria-hidden="true">CAD $</span><input id="in-o1" type="number" inputMode="decimal" min={0} step="0.01" placeholder="0.00" value={o1} disabled={!canEdit} onChange={(e) => setOffering('offering_1', e.target.value)} /></div>
             </div>
             <div className="grow">
               <label htmlFor="in-o2">2nd Offering (Project)</label>
-              <div className="money"><span>CAD $</span><input id="in-o2" type="number" inputMode="decimal" min={0} step="0.01" placeholder="0.00" value={o2} disabled={!canEdit} onChange={(e) => setOffering('offering_2', e.target.value)} /></div>
+              <div className="money"><span aria-hidden="true">CAD $</span><input id="in-o2" type="number" inputMode="decimal" min={0} step="0.01" placeholder="0.00" value={o2} disabled={!canEdit} onChange={(e) => setOffering('offering_2', e.target.value)} /></div>
             </div>
             <div className="sumrow"><span>Total offering</span><span className="num">{cad(offTot(s))}</span></div>
           </div>
