@@ -71,6 +71,7 @@ export function AssemblyReportFlow(props: Props) {
   const [includeOff, setIncludeOff] = useState(true)
   const [saveState, setSaveState] = useState<'saved' | 'saving' | 'unsaved' | 'error'>(initial.savedAt ? 'saved' : 'unsaved')
   const firstRender = useRef(true)
+  const stepsRef = useRef<HTMLOListElement>(null)
   // Tracks edits not yet confirmed saved, for the leave warning and the save-on-leave below.
   const version = useRef(0)
   const dirty = useRef(false)
@@ -173,8 +174,18 @@ export function AssemblyReportFlow(props: Props) {
       // Storage blocked: the step just isn't remembered.
     }
     requestAnimationFrame(() => {
-      if (focusId) document.getElementById(focusId)?.scrollIntoView({ block: 'center' })
-      else window.scrollTo({ top: 0 })
+      const smooth = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'
+      if (focusId) {
+        document.getElementById(focusId)?.scrollIntoView({ block: 'center', behavior: smooth })
+        return
+      }
+      // Keep the page where it is when the step tabs are already on screen;
+      // otherwise bring the tabs (not the top of the page) into view.
+      const bar = stepsRef.current
+      if (!bar) return
+      const r = bar.getBoundingClientRect()
+      const header = document.querySelector('header.top')?.getBoundingClientRect().bottom ?? 0
+      if (r.top < header || r.bottom > window.innerHeight) bar.scrollIntoView({ block: 'start', behavior: smooth })
     })
   }
   const saveChurchField = async (field: string, value: string) => {
@@ -385,7 +396,7 @@ export function AssemblyReportFlow(props: Props) {
 
       {numbersPanel}
 
-      <ol className="steps">
+      <ol className="steps" ref={stepsRef}>
         {['Check the data', 'Answer the questions', 'Review and download'].map((l, i) => (
           <li key={l} aria-current={i + 1 === step ? 'step' : undefined} className={i + 1 < step ? 'done' : ''}>
             <button onClick={() => go(i + 1)}><b>{i + 1}</b>{l}</button>
@@ -489,8 +500,18 @@ export function AssemblyReportFlow(props: Props) {
         <>
           <div className="panel stack" style={{ gap: 8 }}>
             <h3>Ready to submit?</h3>
-            <div className="toolbar" style={{ justifyContent: 'space-between' }}><span>Sunday entries</span><span className={`pill ${recorded.length === expected.length ? 'ok' : 'miss'}`}>{recorded.length} of {expected.length} Sundays</span></div>
-            <div className="toolbar" style={{ justifyContent: 'space-between' }}><span>Required questions</span>{missing.length ? <span className="pill miss">{missing.length} unanswered: Q{missing.map((i) => i.n).join(', Q')}</span> : <span className="pill ok">All answered</span>}</div>
+            <div className="readyrow"><span>Sunday entries</span><span className={`pill ${recorded.length === expected.length ? 'ok' : 'miss'}`}>{recorded.length} of {expected.length} Sundays</span></div>
+            <div className="readyrow"><span>Required questions</span>{missing.length ? <span className="pill miss">{missing.length} unanswered</span> : <span className="pill ok">All answered</span>}</div>
+            {missing.length > 0 && (
+              <ul className="unanswered" aria-label="Unanswered questions">
+                {missing.map((i) => (
+                  <li key={i.n}>
+                    <button type="button" className="link" onClick={() => (PERSON(i) ? go(2, `q${i.n}`) : go(1))}>Q{i.n}</button>
+                    <span>{i.t}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
             {inProgress && <span className="hint">This quarter is still in progress. Numbers will change until it ends.</span>}
             <div className="toolbar">
               <label className="check"><input type="checkbox" checked={appendix} onChange={(e) => setAppendix(e.target.checked)} /> Attach monthly appendix</label>
