@@ -3,7 +3,6 @@
 import { checkNewPassword } from '@/lib/passwords'
 import { cleanName } from '@/lib/people'
 import { requireMember } from '@/lib/session'
-import { createAdminClient } from '@/lib/supabase/admin'
 
 export type AccountState = { ok: boolean; message: string } | null
 
@@ -19,7 +18,8 @@ export async function changeOwnPassword(_prev: AccountState, formData: FormData)
   const { error: wrong } = await supabase.auth.signInWithPassword({ email: user.email ?? '', password: current })
   if (wrong) return { ok: false, message: 'Your current password is not right.' }
 
-  const { error } = await createAdminClient().auth.admin.updateUserById(user.id, { password, app_metadata: { must_change_password: false } })
+  // Through the person's own (just re-confirmed) session, so they stay signed in on this device.
+  const { error } = await supabase.auth.updateUser({ password })
   if (error) return { ok: false, message: `Could not save the password. ${error.message}` }
   return { ok: true, message: 'Password changed. Use it next time you sign in.' }
 }
