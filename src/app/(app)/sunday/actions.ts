@@ -18,7 +18,11 @@ export async function saveSunday(input: Service): Promise<SaveResult> {
   if (!canEnterSundays(role)) return { ok: false, error: 'You can view Sundays but not change them.' }
   if (!isISODate(input.service_date)) return { ok: false, error: 'Pick a valid date.' }
   if (![input.men, input.women, input.children].every(count)) return { ok: false, error: 'Counts must be whole numbers from 0 to 9999.' }
-  if (![input.offering_1, input.offering_2].every(amount)) return { ok: false, error: 'Offerings must be amounts of 0 or more.' }
+  if (![input.offering_1, input.offering_2, input.offering_1_usd, input.offering_2_usd, input.offering_special, input.offering_special_usd, input.pledge, input.pledge_usd, input.tithe, input.tithe_usd].every(amount))
+    return { ok: false, error: 'Amounts must be 0 or more.' }
+  const note = String(input.offering_special_note ?? '').trim().replace(/\s+/g, ' ')
+  if (note.length > 80) return { ok: false, error: 'Keep the special offering description to 80 characters.' }
+  if (!Number.isInteger(input.new_members) || input.new_members < 0 || input.new_members > 999) return { ok: false, error: 'New members must be a whole number from 0 to 999.' }
 
   const s: Service = {
     service_date: input.service_date,
@@ -27,6 +31,16 @@ export async function saveSunday(input: Service): Promise<SaveResult> {
     children: input.children,
     offering_1: Math.round(input.offering_1 * 100) / 100,
     offering_2: Math.round(input.offering_2 * 100) / 100,
+    offering_1_usd: Math.round(input.offering_1_usd * 100) / 100,
+    offering_2_usd: Math.round(input.offering_2_usd * 100) / 100,
+    new_members: input.new_members,
+    offering_special: Math.round(input.offering_special * 100) / 100,
+    offering_special_usd: Math.round(input.offering_special_usd * 100) / 100,
+    offering_special_note: note,
+    pledge: Math.round(input.pledge * 100) / 100,
+    pledge_usd: Math.round(input.pledge_usd * 100) / 100,
+    tithe: Math.round(input.tithe * 100) / 100,
+    tithe_usd: Math.round(input.tithe_usd * 100) / 100,
   }
   const { data: existing } = await supabase
     .from('services')

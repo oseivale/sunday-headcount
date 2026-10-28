@@ -1,7 +1,7 @@
 import { ORDL, shortDate, usDate, ymLabel, qMonths } from '../dates'
 import { ABC, BANDS, SUP, answerFor, assemblyForm, type FormContext } from '../reports/assembly-quarterly'
 import { isQuestion } from '../reports/types'
-import { money, r1, statsOf, sum, tot } from '../stats'
+import { money, offTot, r1, receivedTot, receivedTotUsd, statsOf, sum, tot } from '../stats'
 import { OBLIGATIONS, STATUS_LABEL, type Service } from '../types'
 import { APPENDIX_TABLE, BLUE, INK, footer, formKit, newDoc, table } from './common'
 
@@ -123,12 +123,12 @@ export function buildAssemblyPdf({ ctx, signedInitials, signedOn, supervisorName
       table(doc, {
         ...APPENDIX_TABLE,
         startY: y,
-        head: [['Month', 'Sundays', 'Avg men', 'Avg women', 'Avg children', 'Avg adults', 'Avg total', ...(includeOfferings ? ['Total offering'] : [])]],
+        head: [['Month', 'Sundays', 'Avg men', 'Avg women', 'Avg children', 'Avg adults', 'Avg total', 'New members', ...(includeOfferings ? ['Grand Total CAD', 'Grand Total USD'] : [])]],
         body: ms.map((m) => {
           const s = statsOf(inMonth(m))
-          return [ymLabel(m), s.n, r1(s.men), r1(s.women), r1(s.children), r1(s.adults), r1(s.total), ...(includeOfferings ? [money(s.offTotal)] : [])]
+          return [ymLabel(m), s.n, r1(s.men), r1(s.women), r1(s.children), r1(s.adults), r1(s.total), s.newMembers, ...(includeOfferings ? [money(s.received), money(s.usdReceived)] : [])]
         }),
-        foot: [['Quarter', qs.n, r1(qs.men), r1(qs.women), r1(qs.children), r1(qs.adults), r1(qs.total), ...(includeOfferings ? [money(qs.offTotal)] : [])]],
+        foot: [['Quarter', qs.n, r1(qs.men), r1(qs.women), r1(qs.children), r1(qs.adults), r1(qs.total), qs.newMembers, ...(includeOfferings ? [money(qs.received), money(qs.usdReceived)] : [])]],
       }) + 22
     ms.forEach((m) => {
       const list: Service[] = inMonth(m)
@@ -142,19 +142,19 @@ export function buildAssemblyPdf({ ctx, signedInitials, signedOn, supervisorName
       doc.setTextColor(...BLUE)
       doc.text(ymLabel(m).toUpperCase(), 54, y)
       doc.setTextColor(...INK)
-      const head = ['Date', 'Men', 'Women', 'Children', 'Total', ...(includeOfferings ? ['1st Offering', '2nd Offering (Project)', 'Total Offering'] : [])]
+      const head = ['Date', 'Men', 'Women', 'Children', 'Total', 'New', ...(includeOfferings ? ['Offerings CAD', 'Tithe CAD', 'Pledge CAD', 'Grand Total CAD', 'Grand Total USD'] : [])]
       y =
         table(doc, {
           ...APPENDIX_TABLE,
           startY: y + 6,
           head: [head],
           body: list.length
-            ? list.map((x) => [`${shortDate(x.service_date)}, ${x.service_date.slice(0, 4)}`, x.men, x.women, x.children, tot(x), ...(includeOfferings ? [money(x.offering_1), money(x.offering_2), money(x.offering_1 + x.offering_2)] : [])])
+            ? list.map((x) => [`${shortDate(x.service_date)}, ${x.service_date.slice(0, 4)}`, x.men, x.women, x.children, tot(x), x.new_members, ...(includeOfferings ? [money(offTot(x)), money(x.tithe), money(x.pledge), money(receivedTot(x)), money(receivedTotUsd(x))] : [])])
             : [['No Sundays recorded', ...head.slice(1).map(() => '')]],
           foot: list.length
             ? [
-                ['Total', sum(list.map((x) => x.men)), sum(list.map((x) => x.women)), sum(list.map((x) => x.children)), sum(list.map(tot)), ...(includeOfferings ? [money(s.off1), money(s.off2), money(s.offTotal)] : [])],
-                ['Average per Sunday', r1(s.men), r1(s.women), r1(s.children), r1(s.total), ...(includeOfferings ? [money(s.off1 / s.n), money(s.off2 / s.n), money(s.offTotal / s.n)] : [])],
+                ['Total', sum(list.map((x) => x.men)), sum(list.map((x) => x.women)), sum(list.map((x) => x.children)), sum(list.map(tot)), s.newMembers, ...(includeOfferings ? [money(s.offTotal), money(s.tithe), money(s.pledge), money(s.received), money(s.usdReceived)] : [])],
+                ['Average per Sunday', r1(s.men), r1(s.women), r1(s.children), r1(s.total), '', ...(includeOfferings ? [money(s.offTotal / s.n), money(s.tithe / s.n), money(s.pledge / s.n), money(s.received / s.n), money(s.usdReceived / s.n)] : [])],
               ]
             : [],
         }) + 22

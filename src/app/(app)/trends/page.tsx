@@ -58,8 +58,8 @@ export default async function TrendsPage({ searchParams }: { searchParams: Promi
       <div className="kpis">
         <div className="kpi"><div className="l">Average Sunday attendance</div><div className="v">{r1(st.total)}</div><div className="s"><Delta p={ps && pct(st.total, ps.total)} suffix="vs previous period" /></div></div>
         <div className="kpi"><div className="l">Average adults</div><div className="v">{r1(st.adults)}</div><div className="s"><Delta p={ps && pct(st.adults, ps.adults)} suffix="vs previous" /></div></div>
-        <div className="kpi"><div className="l">Total offerings</div><div className="v">{money(st.offTotal)}</div><div className="s"><Delta p={ps && st.n && ps.n ? pct(st.offTotal / st.n, ps.offTotal / ps.n) : null} suffix="per Sunday" /></div></div>
-        <div className="kpi"><div className="l">Sundays recorded</div><div className="v">{st.n}</div><div className="s flat">{list.length ? `${shortDate(list[0].service_date)} to ${shortDate(list[list.length - 1].service_date)}` : 'None in this range'}</div></div>
+        <div className="kpi"><div className="l">Grand Total (CAD)</div><div className="v">{money(st.received)}</div><div className="s">{st.usdReceived > 0 ? <span className="flat">+ USD {money(st.usdReceived)}</span> : <Delta p={ps && st.n && ps.n ? pct(st.received / st.n, ps.received / ps.n) : null} suffix="per Sunday" />}</div></div>
+        <div className="kpi"><div className="l">New members</div><div className="v">{st.newMembers}</div><div className="s flat">{st.n} Sundays recorded{list.length ? `, ${shortDate(list[0].service_date)} to ${shortDate(list[list.length - 1].service_date)}` : ''}</div></div>
       </div>
       <div className="panel chart">
         <h3>Weekly attendance</h3>
@@ -83,18 +83,20 @@ export default async function TrendsPage({ searchParams }: { searchParams: Promi
         />
       </div>
       <div className="panel chart">
-        <h3>Offerings by month</h3>
+        <h3>Money received by month (CAD)</h3>
         <div className="legend">
-          <span style={{ '--sw': 'var(--c1)' } as React.CSSProperties}>1st Offering</span>
-          <span style={{ '--sw': 'var(--c4)' } as React.CSSProperties}>2nd Offering (Project)</span>
+          <span style={{ '--sw': 'var(--c1)' } as React.CSSProperties}>Offerings</span>
+          <span style={{ '--sw': 'var(--c2)' } as React.CSSProperties}>Tithe</span>
+          <span style={{ '--sw': 'var(--c3)' } as React.CSSProperties}>Pledge</span>
         </div>
         <StackedChart
           unit="$"
           totals={months.length <= 12}
           cats={mStats.map(({ m }, i) => ({ label: months.length > 12 && i % 2 ? '' : MON[+m.slice(5) - 1], title: ymLabel(m) }))}
           series={[
-            { name: '1st Offering', color: 'var(--c1)', values: mStats.map((x) => x.s.off1) },
-            { name: '2nd Offering (Project)', color: 'var(--c4)', values: mStats.map((x) => x.s.off2) },
+            { name: 'Offerings', color: 'var(--c1)', values: mStats.map((x) => x.s.offTotal) },
+            { name: 'Tithe', color: 'var(--c2)', values: mStats.map((x) => x.s.tithe) },
+            { name: 'Pledge', color: 'var(--c3)', values: mStats.map((x) => x.s.pledge) },
           ]}
         />
       </div>
@@ -102,11 +104,11 @@ export default async function TrendsPage({ searchParams }: { searchParams: Promi
         <h3 style={{ marginBottom: 8 }}>Month by month</h3>
         <div className="tbl">
           <table>
-            <thead><tr><th>Month</th><th>Sundays</th><th>Avg men</th><th>Avg women</th><th>Avg children</th><th>Avg adults</th><th>Avg total</th><th>1st offering</th><th>2nd offering</th><th>Total offering</th></tr></thead>
+            <thead><tr><th>Month</th><th>Sundays</th><th>Avg men</th><th>Avg women</th><th>Avg children</th><th>Avg adults</th><th>Avg total</th><th>New members</th><th>Offerings (CAD)</th><th>Tithe (CAD)</th><th>Pledge (CAD)</th><th>Grand Total CAD</th><th>Grand Total USD</th></tr></thead>
             <tbody>
               {mStats.slice().reverse().map(({ m, s }) => (
                 <tr key={m}>
-                  <td><Link href={`/monthly?month=${m}`}>{ymLabel(m)}</Link></td><td>{s.n}</td><td>{r1(s.men)}</td><td>{r1(s.women)}</td><td>{r1(s.children)}</td><td>{r1(s.adults)}</td><td><b>{r1(s.total)}</b></td><td>{money(s.off1)}</td><td>{money(s.off2)}</td><td><b>{money(s.offTotal)}</b></td>
+                  <td><Link href={`/monthly?month=${m}`}>{ymLabel(m)}</Link></td><td>{s.n}</td><td>{r1(s.men)}</td><td>{r1(s.women)}</td><td>{r1(s.children)}</td><td>{r1(s.adults)}</td><td><b>{r1(s.total)}</b></td><td>{s.newMembers}</td><td>{money(s.offTotal)}</td><td>{money(s.tithe)}</td><td>{money(s.pledge)}</td><td><b>{money(s.received)}</b></td><td>{s.usdReceived ? money(s.usdReceived) : '–'}</td>
                 </tr>
               ))}
             </tbody>

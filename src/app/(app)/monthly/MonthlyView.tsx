@@ -6,7 +6,7 @@ import { useState, useTransition } from 'react'
 import { Delta } from '@/components/Delta'
 import { useToast } from '@/components/Toast'
 import { MON, prevYm, shortDate, ymLabel } from '@/lib/dates'
-import { money, pct, r1, statsOf, sum, tot } from '@/lib/stats'
+import { money, offTot, pct, r1, receivedTot, receivedTotUsd, statsOf, sum, tot } from '@/lib/stats'
 import { OBLIGATIONS, STATUS_LABEL, type Church, type ObligationKey, type ObligationStatus, type Service } from '@/lib/types'
 import { setObligation } from './actions'
 
@@ -71,25 +71,31 @@ export function MonthlyView({ church, ym, months, services, prevServices, obliga
           <div className="kpis">
             <div className="kpi"><div className="l">Average Sunday attendance</div><div className="v">{r1(st.total)}</div><div className="s"><Delta p={ps && pct(st.total, ps.total)} suffix={`vs ${pmLabel}`} /></div></div>
             <div className="kpi"><div className="l">Average adults</div><div className="v">{r1(st.adults)}</div><div className="s"><Delta p={ps && pct(st.adults, ps.adults)} suffix={`vs ${pmLabel}`} /></div></div>
-            <div className="kpi"><div className="l">Total offerings</div><div className="v">{money(st.offTotal)}</div><div className="s"><Delta p={ps && pct(st.offTotal, ps.offTotal)} suffix={`vs ${pmLabel}`} /></div></div>
-            <div className="kpi"><div className="l">Highest Sunday</div><div className="v">{st.peak ? tot(st.peak) : '-'}</div><div className="s flat">{st.peak ? shortDate(st.peak.service_date) : ''}</div></div>
+            <div className="kpi"><div className="l">Grand Total (CAD)</div><div className="v">{money(st.received)}</div><div className="s">{st.usdReceived > 0 ? <span className="flat">+ USD {money(st.usdReceived)}</span> : <Delta p={ps && pct(st.received, ps.received)} suffix={`vs ${pmLabel}`} />}</div></div>
+            <div className="kpi"><div className="l">New members</div><div className="v">{st.newMembers}</div><div className="s flat">Highest Sunday: {st.peak ? `${tot(st.peak)} on ${shortDate(st.peak.service_date)}` : '–'}</div></div>
           </div>
           <div className="panel">
             <h3 style={{ marginBottom: 8 }}>Sundays in {ymLabel(ym)}</h3>
             <div className="tbl">
               <table>
-                <thead><tr><th>Date</th><th>Men</th><th>Women</th><th>Children</th><th>Total</th><th>1st offering</th><th>2nd (Project)</th><th>Total offering</th></tr></thead>
+                <thead><tr><th>Date</th><th>Men</th><th>Women</th><th>Children</th><th>Total</th><th>New members</th><th>1st</th><th>2nd</th><th>Special</th><th>Offerings</th><th>Tithe</th><th>Pledge</th><th>Grand Total CAD</th><th>Grand Total USD</th></tr></thead>
                 <tbody>
                   {services.map((s) => (
                     <tr key={s.service_date}>
-                      <td><Link href={`/sunday?date=${s.service_date}`}>{shortDate(s.service_date)}</Link></td><td>{s.men}</td><td>{s.women}</td><td>{s.children}</td><td><b>{tot(s)}</b></td><td>{money(s.offering_1)}</td><td>{money(s.offering_2)}</td><td><b>{money(s.offering_1 + s.offering_2)}</b></td>
+                      <td><Link href={`/sunday?date=${s.service_date}`}>{shortDate(s.service_date)}</Link></td><td>{s.men}</td><td>{s.women}</td><td>{s.children}</td><td><b>{tot(s)}</b></td><td>{s.new_members}</td><td>{money(s.offering_1)}</td><td>{money(s.offering_2)}</td><td title={s.offering_special_note}>{money(s.offering_special)}</td><td>{money(offTot(s))}</td><td>{money(s.tithe)}</td><td>{money(s.pledge)}</td><td><b>{money(receivedTot(s))}</b></td><td><b>{receivedTotUsd(s) ? money(receivedTotUsd(s)) : '–'}</b></td>
                     </tr>
                   ))}
-                  <tr className="tot"><td>Total</td><td>{sum(services.map((s) => s.men))}</td><td>{sum(services.map((s) => s.women))}</td><td>{sum(services.map((s) => s.children))}</td><td>{sum(services.map(tot))}</td><td>{money(st.off1)}</td><td>{money(st.off2)}</td><td>{money(st.offTotal)}</td></tr>
-                  <tr className="sub"><td>Average per Sunday</td><td>{r1(st.men)}</td><td>{r1(st.women)}</td><td>{r1(st.children)}</td><td>{r1(st.total)}</td><td>{money(st.off1 / st.n)}</td><td>{money(st.off2 / st.n)}</td><td>{money(st.offTotal / st.n)}</td></tr>
+                  <tr className="tot"><td>Total</td><td>{sum(services.map((s) => s.men))}</td><td>{sum(services.map((s) => s.women))}</td><td>{sum(services.map((s) => s.children))}</td><td>{sum(services.map(tot))}</td><td>{st.newMembers}</td><td>{money(st.off1)}</td><td>{money(st.off2)}</td><td>{money(st.special)}</td><td>{money(st.offTotal)}</td><td>{money(st.tithe)}</td><td>{money(st.pledge)}</td><td>{money(st.received)}</td><td>{money(st.usdReceived)}</td></tr>
+                  <tr className="sub"><td>Average per Sunday</td><td>{r1(st.men)}</td><td>{r1(st.women)}</td><td>{r1(st.children)}</td><td>{r1(st.total)}</td><td></td><td>{money(st.off1 / st.n)}</td><td>{money(st.off2 / st.n)}</td><td>{money(st.special / st.n)}</td><td>{money(st.offTotal / st.n)}</td><td>{money(st.tithe / st.n)}</td><td>{money(st.pledge / st.n)}</td><td>{money(st.received / st.n)}</td><td>{money(st.usdReceived / st.n)}</td></tr>
                 </tbody>
               </table>
             </div>
+            {services.some((x) => x.offering_special > 0 || x.offering_special_usd > 0) && (
+              <p className="hint" style={{ margin: '8px 0 0' }}>
+                Special offerings: {services.filter((x) => x.offering_special > 0 || x.offering_special_usd > 0).map((x) => `${shortDate(x.service_date)}${x.offering_special_note ? ` (${x.offering_special_note})` : ''}`).join(' · ')}.
+                {st.usdReceived > 0 && ' USD amounts are kept separate from CAD.'}
+              </p>
+            )}
           </div>
         </>
       ) : (

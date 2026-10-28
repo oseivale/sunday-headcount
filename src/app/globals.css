@@ -246,3 +246,15 @@ input[type=date] { min-width: 0; max-width: 100% }
 .stepper input { padding: 0 4px; -moz-appearance: textfield; appearance: textfield }
 .stepper input::-webkit-outer-spin-button, .stepper input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0 }
 .money span { line-height: 1 }
+/* offerings: CAD and USD side by side for each offering */
+.offering { display: flex; flex-direction: column; gap: 6px; padding-block: 10px; border-top: 1px solid var(--line) }
+.offering:first-of-type { border-top: 0 }
+.offering label { font-weight: 700 }
+.moneypair { display: grid; grid-template-columns: 1fr 1fr; gap: 8px }
+.moneypair .money { width: 100% }
+.sumrow .totals { display: flex; flex-direction: column; align-items: flex-end; gap: 2px }
+.newmembers { margin-top: 10px; border-top: 1px dashed var(--line) !important }
+.newmembers label { display: block }
+.sumrow .totals .zero { color: var(--muted); font-weight: 600; font-size: 1.05rem }
+.stepper input::placeholder { color: var(--muted); opacity: .6 }
+.offering input[type=text] { width: 100% }

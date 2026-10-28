@@ -7,7 +7,7 @@ This is **iteration 1**: everything the prototype does, with real accounts and a
 
 | Screen | Who sees it | What it does |
 | --- | --- | --- |
-| Sunday | Everyone | Enter men, women, children and both offerings. Copies the WhatsApp message. Saving emails the summary. |
+| Sunday | Everyone | Enter men, women, children, new members; 1st, 2nd and special offerings, tithe and pledge, each in CAD and USD. Copies the message. Saving emails the summary. |
 | Trends | Everyone | Weekly attendance, monthly offerings, month-by-month table. |
 | Monthly | Pastor, admins | Month summary, fiscal obligations, monthly PDF. |
 | Reports | Pastor, admins | Quarterly Assembly Reporting Form: report numbers, 3 steps, signature, PDF. |
@@ -31,7 +31,7 @@ Run `npm run build` once before deploying. It type-checks the whole project and 
 ## 2. Set up Supabase
 
 1. Create a project at [supabase.com](https://supabase.com). Pick the **Canada (Central)** region if offered.
-2. **Create the tables.** Open **SQL Editor → New query**, paste all of `supabase/migrations/0001_init.sql`, and click **Run**.
+2. **Create the tables.** Open **SQL Editor → New query**, paste all of `supabase/migrations/0001_init.sql`, and click **Run**. Then do the same, in number order, with `0002_profiles.sql` (people's names) `0003_usd_and_new_members.sql` (USD offerings and new members) and `0004_special_pledge_tithe.sql` (special offering, pledge and tithe). Later updates add more files; run each new one once.
 3. **Copy the keys** from **Project Settings → API** (or **API Keys**) into `.env.local`:
    - Project URL → `NEXT_PUBLIC_SUPABASE_URL`
    - anon / publishable key → `NEXT_PUBLIC_SUPABASE_ANON_KEY`
@@ -45,7 +45,7 @@ Sign in at http://localhost:3000 with that email and password.
 
 ### Adding people and resetting passwords
 
-- **Add someone:** **Settings → Team** → email + role → **Add person**. The app shows a one-time password once.
+- **Add someone:** **Settings → Team** → first name, last name, email and role → **Add person**. The app shows a one-time password once.
   Give it to them in person or by text (not email). When they first sign in, they must choose their own password.
 - **Forgotten password:** **Settings → Team** → **Reset password** next to their name. Same one-time password flow; their old password stops working.
 - **Change your own password:** **My account** (top right).

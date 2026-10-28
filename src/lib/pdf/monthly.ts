@@ -1,5 +1,5 @@
 import { prevYm, shortDate, ymLabel } from '../dates'
-import { adults, money, offTot, r1, statsOf, sum, tot } from '../stats'
+import { adults, money, offTot, offTotUsd, r1, receivedTot, receivedTotUsd, statsOf, sum, tot } from '../stats'
 import { OBLIGATIONS, STATUS_LABEL, type Church, type ObligationStatus, type Service } from '../types'
 import { FORM_TABLE, formKit, newDoc, table } from './common'
 
@@ -52,29 +52,41 @@ export function buildMonthlyPdf({ church, ym, services, obligations, includeOffe
   field(`Adult average attendance for ${ymLabel(ym)} (men + women)`, st.n ? r1(st.adults) : '')
   field(`Total average attendance for ${ymLabel(ym)} (men, women and children)`, st.n ? r1(st.total) : '')
   field(`Number of Sundays recorded in ${ymLabel(ym)}`, st.n)
+  field(`New members in ${ymLabel(ym)}`, st.n ? st.newMembers : '')
   grid(
     'Attendance by Sunday',
-    ['Date', 'Men', 'Women', 'Children', 'Adults', 'Total'],
-    services.map((s) => [sd(s.service_date), s.men, s.women, s.children, adults(s), tot(s)]),
+    ['Date', 'Men', 'Women', 'Children', 'Adults', 'Total', 'New members'],
+    services.map((s) => [sd(s.service_date), s.men, s.women, s.children, adults(s), tot(s), s.new_members]),
     services.length
       ? [
-          ['Total', sum(services.map((s) => s.men)), sum(services.map((s) => s.women)), sum(services.map((s) => s.children)), sum(services.map(adults)), sum(services.map(tot))],
-          ['Average per Sunday', r1(st.men), r1(st.women), r1(st.children), r1(st.adults), r1(st.total)],
+          ['Total', sum(services.map((s) => s.men)), sum(services.map((s) => s.women)), sum(services.map((s) => s.children)), sum(services.map(adults)), sum(services.map(tot)), st.newMembers],
+          ['Average per Sunday', r1(st.men), r1(st.women), r1(st.children), r1(st.adults), r1(st.total), ''],
         ]
       : [],
   )
-  if (includeOfferings)
-    grid(
-      'Offerings by Sunday (CAD)',
-      ['Date', '1st Offering', '2nd Offering (Project)', 'Total Offering'],
-      services.map((s) => [sd(s.service_date), money(s.offering_1), money(s.offering_2), money(offTot(s))]),
-      services.length
-        ? [
-            ['Total', money(st.off1), money(st.off2), money(st.offTotal)],
-            ['Average per Sunday', money(st.off1 / st.n), money(st.off2 / st.n), money(st.offTotal / st.n)],
-          ]
-        : [],
-    )
+  if (includeOfferings) {
+    // One table per currency (amounts are never converted). USD only appears when some was received.
+    const head = ['Date', '1st', '2nd (Project)', 'Special', 'Offerings', 'Tithe', 'Pledge', 'Grand Total']
+    const cadRow = (s: Service) => [sd(s.service_date), money(s.offering_1), money(s.offering_2), money(s.offering_special), money(offTot(s)), money(s.tithe), money(s.pledge), money(receivedTot(s))]
+    const usdRow = (s: Service) => [sd(s.service_date), money(s.offering_1_usd), money(s.offering_2_usd), money(s.offering_special_usd), money(offTotUsd(s)), money(s.tithe_usd), money(s.pledge_usd), money(receivedTotUsd(s))]
+    grid('Money received by Sunday (CAD)', head, services.map(cadRow), services.length
+      ? [['Total', money(st.off1), money(st.off2), money(st.special), money(st.offTotal), money(st.tithe), money(st.pledge), money(st.received)]]
+      : [])
+    if (st.usdReceived > 0)
+      grid('Money received by Sunday (USD)', head, services.map(usdRow), [['Total', money(st.usd1), money(st.usd2), money(st.usdSpecial), money(st.usdTotal), money(st.usdTithe), money(st.usdPledge), money(st.usdReceived)]])
+    const specials = services.filter((s) => s.offering_special > 0 || s.offering_special_usd > 0)
+    if (specials.length) {
+      k.need(30 + specials.length * 14)
+      k.font('normal', 9.5)
+      doc.text('Special offerings:', 50, k.y)
+      k.y += 14
+      specials.forEach((s) => {
+        doc.text(`${sd(s.service_date)}: ${s.offering_special_note || 'no description'}`, 62, k.y)
+        k.y += 14
+      })
+      k.y += 12
+    }
+  }
 
   k.section('IV. REGULATORY AND FISCAL OBLIGATIONS')
   k.sub('B. FISCAL OBLIGATIONS')

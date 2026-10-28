@@ -15,8 +15,18 @@ export type Service = {
   men: number
   women: number
   children: number
-  offering_1: number
-  offering_2: number
+  offering_1: number // CAD
+  offering_2: number // CAD
+  offering_1_usd: number
+  offering_2_usd: number
+  offering_special: number // CAD
+  offering_special_usd: number
+  offering_special_note: string // e.g. "Building fund"
+  pledge: number // CAD received towards pledges
+  pledge_usd: number
+  tithe: number // CAD
+  tithe_usd: number
+  new_members: number // people who joined this Sunday; already included in the counts above
 }
 
 export const OBLIGATIONS = [

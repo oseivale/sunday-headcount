@@ -252,13 +252,13 @@ export function AssemblyReportFlow(props: Props) {
       </div>
       <div className="tbl">
         <table>
-          <thead><tr><th>Month</th><th>Sundays</th><th>Avg men</th><th>Avg women</th><th>Avg children</th><th>Avg adults</th><th>Avg total</th><th>Total offering</th></tr></thead>
+          <thead><tr><th>Month</th><th>Sundays</th><th>Avg men</th><th>Avg women</th><th>Avg children</th><th>Avg adults</th><th>Avg total</th><th>New members</th><th>Grand Total CAD</th><th>Grand Total USD</th></tr></thead>
           <tbody>
             {months.map((m) => {
               const s = statsOf(servicesNow.filter((x) => x.service_date.startsWith(m)))
-              return <tr key={m}><td>{ymLabel(m)}</td><td>{s.n}</td><td>{r1(s.men)}</td><td>{r1(s.women)}</td><td>{r1(s.children)}</td><td>{r1(s.adults)}</td><td><b>{r1(s.total)}</b></td><td>{money(s.offTotal)}</td></tr>
+              return <tr key={m}><td>{ymLabel(m)}</td><td>{s.n}</td><td>{r1(s.men)}</td><td>{r1(s.women)}</td><td>{r1(s.children)}</td><td>{r1(s.adults)}</td><td><b>{r1(s.total)}</b></td><td>{s.newMembers}</td><td>{money(s.received)}</td><td>{s.usdReceived ? money(s.usdReceived) : '–'}</td></tr>
             })}
-            <tr className="tot"><td>Quarter</td><td>{qs.n}</td><td>{r1(qs.men)}</td><td>{r1(qs.women)}</td><td>{r1(qs.children)}</td><td>{r1(qs.adults)}</td><td>{r1(qs.total)}</td><td>{money(qs.offTotal)}</td></tr>
+            <tr className="tot"><td>Quarter</td><td>{qs.n}</td><td>{r1(qs.men)}</td><td>{r1(qs.women)}</td><td>{r1(qs.children)}</td><td>{r1(qs.adults)}</td><td>{r1(qs.total)}</td><td>{qs.newMembers}</td><td>{money(qs.received)}</td><td>{qs.usdReceived ? money(qs.usdReceived) : '–'}</td></tr>
           </tbody>
         </table>
       </div>
@@ -302,7 +302,14 @@ export function AssemblyReportFlow(props: Props) {
     const v = answerFor(it, ctx)
     if (it.kind === 'text') return <input type="text" id={`qa-${it.key}`} value={String(v ?? '')} onChange={(e) => setAns(it.key, e.target.value)} />
     if (it.kind === 'number')
-      return <input type="number" min={0} inputMode="numeric" id={`qa-${it.key}`} value={has(v) ? String(v) : ''} style={{ maxWidth: 160 }} onChange={(e) => setAns(it.key, e.target.value === '' ? '' : +e.target.value)} />
+      return (
+        <>
+          <input type="number" min={0} inputMode="numeric" id={`qa-${it.key}`} value={has(v) ? String(v) : ''} style={{ maxWidth: 160 }} onChange={(e) => setAns(it.key, e.target.value === '' ? '' : +e.target.value)} />
+          {it.key === 'membershipNow' && (
+            <span className="hint">New members recorded on Sundays this quarter: <b className="num">{qs.newMembers}</b>. Add them to last quarter&apos;s figure if that&apos;s how you count membership.</span>
+          )}
+        </>
+      )
     if (it.kind === 'choice')
       return (
         <div className="opts">
