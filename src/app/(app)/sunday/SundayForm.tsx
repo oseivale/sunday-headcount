@@ -110,7 +110,7 @@ export function SundayForm({ date, existing, recent, canEdit }: Props) {
         <div className="stack">
           <div className="panel">
             <div className="toolbar" style={{ justifyContent: 'space-between' }}>
-              <h3>Message for the group</h3>
+              <h3>Message to send via text</h3>
               <button type="button" className="btn small" onClick={copy}>Copy text</button>
             </div>
             <div className="msg">{sundayMessage(s)}</div>
