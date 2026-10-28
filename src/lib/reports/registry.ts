@@ -11,7 +11,7 @@ export const REPORTS: ReportTemplate[] = [
   {
     key: 'assembly-quarterly',
     title: 'Assembly Reporting Form',
-    description: 'Quarterly report from the pastor to the overseer and admin.',
+    description: 'Quarterly report from the pastor to the supervisor.',
     group: 'Pastor',
     cadence: 'quarterly',
     roles: ['admin', 'pastor'],
