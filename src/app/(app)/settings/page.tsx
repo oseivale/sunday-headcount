@@ -82,36 +82,38 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
         <h2>Team</h2>
         <p className="hint" style={{ margin: '4px 0 10px' }}>People sign in with their email and password. Only people listed here can open the app. New people and password resets get a one-time password, and they choose their own when they sign in.</p>
         {(members ?? []).map((m) => (
-          <div className="grow" key={m.user_id}>
-            <div style={{ minWidth: 0, overflowWrap: 'anywhere' }}>
+          <div className="member" key={m.user_id}>
+            <div className="member-info">
               <b>{displayName(profiles.get(m.user_id), emails.get(m.user_id) || m.user_id)}</b>
               {m.user_id === user.id && <span className="hint"> (you)</span>}
               {!profiles.get(m.user_id)?.first_name && <span className="pill warn" style={{ marginLeft: 6 }}>Add name</span>}
               <div className="hint">{emails.get(m.user_id)} · {ROLE_HELP[m.role as Role]}</div>
               <details className="namedit">
                 <summary className="link">Edit name</summary>
-                <form action={updateMemberName} className="addform">
+                <form action={updateMemberName} className="personform">
                   <input type="hidden" name="user_id" value={m.user_id} />
                   <input type="text" name="first_name" aria-label="First name" placeholder="First name" defaultValue={profiles.get(m.user_id)?.first_name ?? ''} required maxLength={60} />
                   <input type="text" name="last_name" aria-label="Last name" placeholder="Last name" defaultValue={profiles.get(m.user_id)?.last_name ?? ''} required maxLength={60} />
-                  <button className="btn small">Save name</button>
+                  <button className="btn full">Save name</button>
                 </form>
               </details>
             </div>
-            <div className="toolbar">
-              <form action={changeRole} className="toolbar">
+            <div className="member-actions">
+              <form action={changeRole} className="rolepick">
                 <input type="hidden" name="user_id" value={m.user_id} />
-                <select name="role" defaultValue={m.role} aria-label="Role">
+                <select name="role" defaultValue={m.role} aria-label={`Role for ${displayName(profiles.get(m.user_id), emails.get(m.user_id))}`}>
                   {(Object.keys(ROLE_LABEL) as Role[]).map((r) => <option key={r} value={r}>{ROLE_LABEL[r]}</option>)}
                 </select>
-                <button className="btn small">Update</button>
+                <button className="btn">Update role</button>
               </form>
-              {m.user_id !== user.id && <ResetPasswordButton userId={m.user_id} email={emails.get(m.user_id) || ''} />}
               {m.user_id !== user.id && (
-                <form action={removeMember}>
-                  <input type="hidden" name="user_id" value={m.user_id} />
-                  <button className="btn small danger">Remove</button>
-                </form>
+                <div className="member-buttons">
+                  <ResetPasswordButton userId={m.user_id} email={emails.get(m.user_id) || ''} />
+                  <form action={removeMember}>
+                    <input type="hidden" name="user_id" value={m.user_id} />
+                    <button className="btn danger">Remove</button>
+                  </form>
+                </div>
               )}
             </div>
           </div>

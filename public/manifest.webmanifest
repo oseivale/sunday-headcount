@@ -1,7 +1,7 @@
 {
   "name": "Sunday Headcount",
   "short_name": "Headcount",
-  "description": "Sunday attendance, offerings and assembly reports",
+  "description": "Rehoboth Temple Sunday Attendance, offerings and assembly reports",
   "start_url": "/sunday",
   "display": "standalone",
   "background_color": "#F7F7F5",

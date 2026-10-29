@@ -258,3 +258,26 @@ input[type=date] { min-width: 0; max-width: 100% }
 .sumrow .totals .zero { color: var(--muted); font-weight: 600; font-size: 1.05rem }
 .stepper input::placeholder { color: var(--muted); opacity: .6 }
 .offering input[type=text] { width: 100% }
+/* Team list: one column on phones and tablets, details + actions side by side on large screens */
+.member { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; padding-block: 16px; border-top: 1px solid var(--line) }
+.member:first-of-type { border-top: 0 }
+.member-info { min-width: 0; overflow-wrap: anywhere }
+.member-info .hint { margin-top: 2px }
+.member-actions { display: grid; gap: 8px; min-width: 0 }
+.rolepick { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px }
+.rolepick select, .personform input, .personform select { width: 100%; min-height: 44px }
+.member-buttons { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px }
+.member-buttons .btn, .member-buttons form { width: 100% }
+.resetbox.open { grid-column: 1 / -1 }
+.confirmreset { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; align-items: center }
+.confirmreset .hint { grid-column: 1 / -1 }
+.confirmreset .btn { width: 100% }
+.personform { display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; margin-top: 10px }
+.btn.full { width: 100%; min-height: 44px }
+.addperson { margin-top: 8px; padding-top: 16px; border-top: 1px solid var(--line) }
+@media (min-width: 1024px) {
+  .member { grid-template-columns: minmax(0, 1fr) 320px; align-items: start; gap: 20px }
+  .personform { grid-template-columns: repeat(2, minmax(0, 1fr)) }
+  .personform .btn.full { grid-column: 1 / -1 }
+  .addperson .personform { grid-template-columns: repeat(2, minmax(0, 1fr)) }
+}
