@@ -39,5 +39,5 @@ export function sundayMessage(s: Service) {
 }
 
 export function sundaySubject(s: Service, updated: boolean) {
-  return `${updated ? 'Updated: ' : ''}Sunday Headcount: Rehoboth Temple Sunday Attendance, ${shortDate(s.service_date)}, ${s.service_date.slice(0, 4)}: ${tot(s)} people, ${both(receivedTot(s), receivedTotUsd(s))}`
+  return `${updated ? '[Updated] ' : ''}Sunday Headcount: Rehoboth Temple Sunday Attendance, ${shortDate(s.service_date)}, ${s.service_date.slice(0, 4)}: ${tot(s)} people, ${both(receivedTot(s), receivedTotUsd(s))}`
 }
