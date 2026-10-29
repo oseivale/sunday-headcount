@@ -210,7 +210,7 @@ tr.sub td { color: var(--muted); border-bottom: 0 }
 .addform { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px }
 .addform input { flex: 1 1 200px }
 .login { max-width: 420px; margin: 8vh auto 0 }
-.loginhero { background: var(--brand); color: var(--brand-ink); border-radius: 14px; padding: 28px 20px 22px; display: flex; flex-direction: column; align-items: center; gap: 10px; text-align: center; border-bottom: 4px solid var(--brand-gold) }
+.loginhero { background: var(--brand); color: var(--brand-ink); border-radius: 14px; padding: 28px 20px 22px; display: flex; flex-direction: column; align-items: center; gap: 10px; text-align: center; border-bottom: 4px double var(--brand-gold); border-top: 4px double var(--brand-gold); }
 .loginhero img { width: 112px; height: auto }
 .loginhero h1 { color: var(--brand-ink); font-size: 1.5rem; letter-spacing: .01em }
 .loginhero p { margin: 0; color: var(--brand-gold); font-weight: 600; font-size: .9rem; letter-spacing: .02em }
