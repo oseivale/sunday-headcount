@@ -40,8 +40,9 @@ header.top :focus-visible { outline-color: var(--brand-gold) }
 header.top .hdractions { gap: 14px; flex-shrink: 0 }
 header.top .hdractions form { display: flex; margin: 0 }
 header.top .hdrlink { display: inline-flex; align-items: center; font: inherit; font-weight: 700; line-height: 1.2 }
+header.top .hdrshort { display: none }
 header.top .hdricon { display: none; width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round }
-.hrow { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-block: 12px 10px }
+.hrow { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-block: 12px 10px; margin-bottom: 15px; }
 .brandmark { display: flex; align-items: center; gap: 12px; min-width: 0; color: inherit; text-decoration: none }
 .brandmark img { height: 40px; width: auto; flex-shrink: 0 }
 .brand { font-family: var(--display); font-weight: 700; font-size: 1.15rem; letter-spacing: .01em; line-height: 1.2 }
@@ -225,12 +226,24 @@ tr.sub td { color: var(--muted); border-bottom: 0 }
   .brand { font-size: 1rem }
   .brand small { font-size: .72rem }
   /* My account and Sign out become icons, side by side, with a gap so a mis-tap is unlikely */
-  header.top .hdractions { gap: 14px; flex-wrap: nowrap }
-  header.top .hdrlink { width: 44px; height: 44px; justify-content: center; border-radius: 10px; color: var(--brand-gold) }
+  header.top .hdractions { gap: 6px; flex-wrap: nowrap }
+  header.top .hdractions { align-items: flex-start }
+  header.top .hdrlink { flex-direction: column; gap: 2px; min-width: 48px; min-height: 44px; padding: 2px 0 3px; justify-content: center; border-radius: 10px; color: var(--brand-gold); text-decoration: none }
+  header.top .hdrshort { display: block; font-size: .66rem; font-weight: 600; line-height: 1; letter-spacing: .01em; color: var(--brand-ink); white-space: nowrap }
   header.top .hdrlink:active { background: rgba(247, 247, 245, .1) }
   header.top .hdricon { display: block }
   header.top .hdrlabel { display: none }
   nav.tabs a { font-size: .8rem; padding-inline: 2px }
+}
+/* very narrow phones: keep the title on one line beside the icons */
+@media (max-width: 360px) {
+  .brandmark { gap: 8px }
+  .brandmark img { height: 28px }
+  .brand { font-size: .9rem }
+  .brand small { font-size: .64rem }
+  header.top .hdractions { gap: 2px }
+  header.top .hdrlink { min-width: 44px }
+  header.top .hdrshort { font-size: .6rem }
 }
 .namedit { margin-top: 4px }
 .namedit summary { cursor: pointer; font-size: .85rem; width: fit-content; list-style: none }

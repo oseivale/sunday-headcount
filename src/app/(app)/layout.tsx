@@ -30,6 +30,7 @@ export default async function AppLayout({ children }: Readonly<{ children: React
                   <path d="M4 20c0-4 3.6-6.5 8-6.5s8 2.5 8 6.5" />
                 </svg>
                 <span className="hdrlabel">My account</span>
+                <span className="hdrshort" aria-hidden="true">My account</span>
               </Link>
               <form action="/auth/signout" method="post">
                 <button className="link hdrlink" aria-label="Sign out" title="Sign out">
@@ -39,6 +40,7 @@ export default async function AppLayout({ children }: Readonly<{ children: React
                     <path d="M6 12h10" />
                   </svg>
                   <span className="hdrlabel">Sign out</span>
+                  <span className="hdrshort" aria-hidden="true">Log out</span>
                 </button>
               </form>
             </div>
