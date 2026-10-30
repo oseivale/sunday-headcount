@@ -22,6 +22,7 @@ export type Service = {
   offering_special: number // CAD
   offering_special_usd: number
   offering_special_note: string // e.g. "Building fund"
+  etransfer: number // CAD e-transfers (Interac), entered by the pastor or an admin
   pledge: number // CAD received towards pledges
   pledge_usd: number
   tithe: number // CAD

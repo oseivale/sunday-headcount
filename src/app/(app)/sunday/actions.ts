@@ -4,7 +4,7 @@ import { revalidatePath } from 'next/cache'
 import { isISODate, shortDate } from '@/lib/dates'
 import { sendSundayEmail } from '@/lib/email'
 import { displayName } from '@/lib/people'
-import { canEnterSundays } from '@/lib/roles'
+import { canEnterEtransfer, canEnterSundays } from '@/lib/roles'
 import { requireMember } from '@/lib/session'
 import type { Service } from '@/lib/types'
 
@@ -18,7 +18,7 @@ export async function saveSunday(input: Service): Promise<SaveResult> {
   if (!canEnterSundays(role)) return { ok: false, error: 'You can view Sundays but not change them.' }
   if (!isISODate(input.service_date)) return { ok: false, error: 'Pick a valid date.' }
   if (![input.men, input.women, input.children].every(count)) return { ok: false, error: 'Counts must be whole numbers from 0 to 9999.' }
-  if (![input.offering_1, input.offering_2, input.offering_1_usd, input.offering_2_usd, input.offering_special, input.offering_special_usd, input.pledge, input.pledge_usd, input.tithe, input.tithe_usd].every(amount))
+  if (![input.offering_1, input.offering_2, input.offering_1_usd, input.offering_2_usd, input.offering_special, input.offering_special_usd, input.etransfer, input.pledge, input.pledge_usd, input.tithe, input.tithe_usd].every(amount))
     return { ok: false, error: 'Amounts must be 0 or more.' }
   const note = String(input.offering_special_note ?? '').trim().replace(/\s+/g, ' ')
   if (note.length > 80) return { ok: false, error: 'Keep the special offering description to 80 characters.' }
@@ -37,6 +37,7 @@ export async function saveSunday(input: Service): Promise<SaveResult> {
     offering_special: Math.round(input.offering_special * 100) / 100,
     offering_special_usd: Math.round(input.offering_special_usd * 100) / 100,
     offering_special_note: note,
+    etransfer: Math.round(input.etransfer * 100) / 100,
     pledge: Math.round(input.pledge * 100) / 100,
     pledge_usd: Math.round(input.pledge_usd * 100) / 100,
     tithe: Math.round(input.tithe * 100) / 100,
@@ -50,16 +51,21 @@ export async function saveSunday(input: Service): Promise<SaveResult> {
     .eq('kind', 'sunday')
     .maybeSingle()
 
+  // Only the pastor and admins send the e-transfer amount; anyone else's save leaves it as it is.
+  // The database enforces the same rule (0005_etransfer.sql).
+  const { etransfer, ...rest } = s
+  const fields = canEnterEtransfer(role) ? { ...rest, etransfer } : rest
   const now = new Date().toISOString()
   const { data: row, error } = await supabase
     .from('services')
     .upsert(
-      { church_id: church.id, kind: 'sunday', ...s, updated_by: user.id, updated_at: now, ...(existing ? {} : { created_by: user.id }) },
+      { church_id: church.id, kind: 'sunday', ...fields, updated_by: user.id, updated_at: now, ...(existing ? {} : { created_by: user.id }) },
       { onConflict: 'church_id,service_date,kind' },
     )
-    .select('id')
+    .select('id, etransfer')
     .single()
   if (error || !row) return { ok: false, error: `Could not save. ${error?.message ?? ''}`.trim() }
+  s.etransfer = Number(row.etransfer) || 0 // the amount actually stored, for the email
 
   revalidatePath('/sunday')
   revalidatePath('/trends')

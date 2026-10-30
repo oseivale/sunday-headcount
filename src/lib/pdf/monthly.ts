@@ -66,11 +66,13 @@ export function buildMonthlyPdf({ church, ym, services, obligations, includeOffe
   )
   if (includeOfferings) {
     // One table per currency (amounts are never converted). USD only appears when some was received.
+    // E-transfers are always CAD, so only the CAD table has that column.
     const head = ['Date', '1st', '2nd (Project)', 'Special', 'Offerings', 'Tithe', 'Pledge', 'Grand Total']
-    const cadRow = (s: Service) => [sd(s.service_date), money(s.offering_1), money(s.offering_2), money(s.offering_special), money(offTot(s)), money(s.tithe), money(s.pledge), money(receivedTot(s))]
+    const cadHead = ['Date', '1st', '2nd (Project)', 'Special', 'E-transfer', 'Offerings', 'Tithe', 'Pledge', 'Grand Total']
+    const cadRow = (s: Service) => [sd(s.service_date), money(s.offering_1), money(s.offering_2), money(s.offering_special), money(s.etransfer), money(offTot(s)), money(s.tithe), money(s.pledge), money(receivedTot(s))]
     const usdRow = (s: Service) => [sd(s.service_date), money(s.offering_1_usd), money(s.offering_2_usd), money(s.offering_special_usd), money(offTotUsd(s)), money(s.tithe_usd), money(s.pledge_usd), money(receivedTotUsd(s))]
-    grid('Money received by Sunday (CAD)', head, services.map(cadRow), services.length
-      ? [['Total', money(st.off1), money(st.off2), money(st.special), money(st.offTotal), money(st.tithe), money(st.pledge), money(st.received)]]
+    grid('Money received by Sunday (CAD)', cadHead, services.map(cadRow), services.length
+      ? [['Total', money(st.off1), money(st.off2), money(st.special), money(st.etransfer), money(st.offTotal), money(st.tithe), money(st.pledge), money(st.received)]]
       : [])
     if (st.usdReceived > 0)
       grid('Money received by Sunday (USD)', head, services.map(usdRow), [['Total', money(st.usd1), money(st.usd2), money(st.usdSpecial), money(st.usdTotal), money(st.usdTithe), money(st.usdPledge), money(st.usdReceived)]])

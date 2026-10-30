@@ -15,9 +15,10 @@ type Props = {
   existing: Service | null
   recent: { date: string; s: Service | null }[]
   canEdit: boolean
+  canEditEtransfer: boolean
 }
 
-type MoneyKey = 'offering_1' | 'offering_2' | 'offering_1_usd' | 'offering_2_usd' | 'offering_special' | 'offering_special_usd' | 'tithe' | 'tithe_usd' | 'pledge' | 'pledge_usd'
+type MoneyKey = 'offering_1' | 'offering_2' | 'offering_1_usd' | 'offering_2_usd' | 'offering_special' | 'offering_special_usd' | 'etransfer' | 'tithe' | 'tithe_usd' | 'pledge' | 'pledge_usd'
 type CountKey = 'men' | 'women' | 'children' | 'new_members'
 
 const GROUPS = [
@@ -26,7 +27,7 @@ const GROUPS = [
   { k: 'children', label: 'Children' },
 ] as const
 
-export function SundayForm({ date, existing, recent, canEdit }: Props) {
+export function SundayForm({ date, existing, recent, canEdit, canEditEtransfer }: Props) {
   const router = useRouter()
   const toast = useToast()
   const [pending, start] = useTransition()
@@ -34,7 +35,7 @@ export function SundayForm({ date, existing, recent, canEdit }: Props) {
     existing ?? {
       service_date: date, men: 0, women: 0, children: 0, new_members: 0,
       offering_1: 0, offering_2: 0, offering_1_usd: 0, offering_2_usd: 0,
-      offering_special: 0, offering_special_usd: 0, offering_special_note: '', tithe: 0, tithe_usd: 0, pledge: 0, pledge_usd: 0,
+      offering_special: 0, offering_special_usd: 0, offering_special_note: '', etransfer: 0, tithe: 0, tithe_usd: 0, pledge: 0, pledge_usd: 0,
     },
   )
   // Amount boxes keep the typed text; an empty box means 0.
@@ -46,6 +47,7 @@ export function SundayForm({ date, existing, recent, canEdit }: Props) {
     offering_2_usd: startText(existing?.offering_2_usd),
     offering_special: startText(existing?.offering_special),
     offering_special_usd: startText(existing?.offering_special_usd),
+    etransfer: startText(existing?.etransfer),
     tithe: startText(existing?.tithe),
     tithe_usd: startText(existing?.tithe_usd),
     pledge: startText(existing?.pledge),
@@ -105,11 +107,11 @@ export function SundayForm({ date, existing, recent, canEdit }: Props) {
     setS((p) => ({ ...p, [k]: v }))
     setDirty(true)
   }
-  const moneyBox = (k: MoneyKey, currency: 'CAD' | 'USD', label: string) => (
+  const moneyBox = (k: MoneyKey, currency: 'CAD' | 'USD', label: string, editable = canEdit) => (
     <div className="money">
       <span aria-hidden="true">{currency} $</span>
       <input id={`in-${k}`} type="number" inputMode="decimal" min={0} step="0.01" placeholder="0.00" aria-label={`${label}, ${currency}`}
-        value={amounts[k]} disabled={!canEdit} onChange={(e) => setOffering(k, e.target.value)} />
+        value={amounts[k]} disabled={!editable} onChange={(e) => setOffering(k, e.target.value)} />
     </div>
   )
   const save = () =>
@@ -200,6 +202,13 @@ export function SundayForm({ date, existing, recent, canEdit }: Props) {
                 {moneyBox('offering_special_usd', 'USD', 'Special offering')}
               </div>
             </div>
+            <div className="offering">
+              <label htmlFor="in-etransfer">E-transfer</label>
+              <div className="moneypair">
+                {moneyBox('etransfer', 'CAD', 'E-transfer', canEditEtransfer)}
+              </div>
+              <span className="hint">{canEditEtransfer ? 'Total e-transfers received for this Sunday.' : 'Entered by the pastor or an admin.'}</span>
+            </div>
             <div className="sumrow">
               <span>Total offering</span>
               <span className="totals">
@@ -207,7 +216,7 @@ export function SundayForm({ date, existing, recent, canEdit }: Props) {
                 <span className={`num ${offTotUsd(s) > 0 ? '' : 'zero'}`}>{usd(offTotUsd(s))}</span>
               </span>
             </div>
-            <p className="hint" style={{ margin: '4px 0 0' }}>1st + 2nd + special offering.</p>
+            <p className="hint" style={{ margin: '4px 0 0' }}>1st + 2nd + special offering + e-transfer.</p>
           </div>
 
           <div className="panel">

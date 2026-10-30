@@ -5,8 +5,8 @@ export const avg = (a: number[]) => (a.length ? sum(a) / a.length : 0)
 export const r1 = (v: number) => Math.round(v)
 export const tot = (s: Service) => s.men + s.women + s.children
 export const adults = (s: Service) => s.men + s.women
-/** Total offering = 1st + 2nd + special. Tithe and pledge are kept separate. */
-export const offTot = (s: Service) => Number(s.offering_1) + Number(s.offering_2) + Number(s.offering_special) // CAD
+/** Total offering = 1st + 2nd + special + e-transfer. Tithe and pledge are kept separate. */
+export const offTot = (s: Service) => Number(s.offering_1) + Number(s.offering_2) + Number(s.offering_special) + Number(s.etransfer) // CAD
 export const offTotUsd = (s: Service) => Number(s.offering_1_usd) + Number(s.offering_2_usd) + Number(s.offering_special_usd)
 /** Everything received: offerings + tithe + pledge. */
 export const receivedTot = (s: Service) => offTot(s) + Number(s.tithe) + Number(s.pledge) // CAD
@@ -27,8 +27,9 @@ export type Stats = {
   total: number
   off1: number
   off2: number
-  offTotal: number // CAD: 1st + 2nd + special
+  offTotal: number // CAD: 1st + 2nd + special + e-transfer
   special: number
+  etransfer: number
   tithe: number
   pledge: number
   received: number // CAD: offerings + tithe + pledge
@@ -55,6 +56,7 @@ export function statsOf(list: Service[]): Stats {
     off2: sum(list.map((s) => Number(s.offering_2))),
     offTotal: sum(list.map(offTot)),
     special: sum(list.map((s) => Number(s.offering_special))),
+    etransfer: sum(list.map((s) => Number(s.etransfer))),
     tithe: sum(list.map((s) => Number(s.tithe))),
     pledge: sum(list.map((s) => Number(s.pledge))),
     received: sum(list.map(receivedTot)),
@@ -85,10 +87,11 @@ export function toService(r: Record<string, unknown>): Service {
     offering_special: Number(r.offering_special) || 0,
     offering_special_usd: Number(r.offering_special_usd) || 0,
     offering_special_note: String(r.offering_special_note ?? ''),
+    etransfer: Number(r.etransfer) || 0,
     pledge: Number(r.pledge) || 0,
     pledge_usd: Number(r.pledge_usd) || 0,
     tithe: Number(r.tithe) || 0,
     tithe_usd: Number(r.tithe_usd) || 0,
   }
 }
-export const SERVICE_COLUMNS = 'service_date, men, women, children, offering_1, offering_2, offering_1_usd, offering_2_usd, new_members, offering_special, offering_special_usd, offering_special_note, pledge, pledge_usd, tithe, tithe_usd'
+export const SERVICE_COLUMNS = 'service_date, men, women, children, offering_1, offering_2, offering_1_usd, offering_2_usd, new_members, offering_special, offering_special_usd, offering_special_note, etransfer, pledge, pledge_usd, tithe, tithe_usd'

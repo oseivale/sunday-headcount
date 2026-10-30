@@ -1,5 +1,5 @@
 import { addDays, isISODate, lastSunday, sundaysBetween, todayISO } from '@/lib/dates'
-import { canEnterSundays } from '@/lib/roles'
+import { canEnterEtransfer, canEnterSundays } from '@/lib/roles'
 import { requireMember } from '@/lib/session'
 import { SERVICE_COLUMNS, toService } from '@/lib/stats'
 import type { Service } from '@/lib/types'
@@ -29,6 +29,7 @@ export default async function SundayPage({ searchParams }: { searchParams: Promi
       existing={current ? toService(current) : null}
       recent={recent}
       canEdit={canEnterSundays(role)}
+      canEditEtransfer={canEnterEtransfer(role)}
     />
   )
 }

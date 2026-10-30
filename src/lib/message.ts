@@ -5,7 +5,7 @@ import type { Service } from './types'
 /** "CAD $30", or "CAD $30 + USD $10" when some of it came in US dollars. */
 const both = (c: number, u: number) => (u > 0 ? `${cad(c)} + ${usd(u)}` : cad(c))
 
-/** The Sunday summary, in the same format the ushers already send. USD, new members, special offering, tithe and pledge appear only when not zero. */
+/** The Sunday summary, in the same format the ushers already send. USD, new members, special offering, e-transfer, tithe and pledge appear only when not zero. */
 export function sundayMessage(s: Service) {
   const lines = [
     longDate(s.service_date),
@@ -28,6 +28,7 @@ export function sundayMessage(s: Service) {
     `2nd Offering (Project): ${both(s.offering_2, s.offering_2_usd)}`,
   )
   if (hasSpecial) lines.push(`Special Offering${s.offering_special_note ? ` (${s.offering_special_note})` : ''}: ${both(s.offering_special, s.offering_special_usd)}`)
+  if (s.etransfer > 0) lines.push(`E-transfer: ${cad(s.etransfer)}`)
   lines.push('', `Total Offering: ${both(offTot(s), offTotUsd(s))}`)
   if (hasTithe || hasPledge) {
     lines.push('')
