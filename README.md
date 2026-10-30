@@ -11,7 +11,7 @@ This is **iteration 1**: everything the prototype does, with real accounts and a
 | Trends | Everyone | Weekly attendance, monthly offerings, month-by-month table. |
 | Monthly | Pastor, admins | Month summary, fiscal obligations, monthly PDF. |
 | Reports | Pastor, admins | Quarterly Assembly Reporting Form: report numbers, 3 steps, signature, PDF. |
-| Settings | Admins | Assembly details, Sunday email list, team and roles. |
+| Settings | Admins | Assembly details, Sunday email list, team and roles, and **Export all data** (backup). |
 
 ---
 
@@ -53,6 +53,17 @@ Sign in at http://localhost:3000 with that email and password.
   ```bash
   node --env-file=.env.local scripts/set-test-password.mjs you@example.com 'a-new-long-password'
   ```
+
+### Backups
+
+Supabase's free plan has no automatic backups. Every month or two, an admin should open **Settings → Back up your data → Export all data**
+and keep the .zip somewhere private (it holds offering amounts and email addresses). Each export is recorded in `audit_log`.
+**Monthly backup email.** The app can also email the same .zip on the 1st of each month (about 7 am Toronto time).
+In Netlify, add the environment variable `BACKUP_EMAIL` with the address to send it to (several: separate with commas), then redeploy.
+Test it right away from **Netlify → Logs & metrics → Functions → monthly-backup → Run now**. Each backup appears in `email_log`,
+and failures show in that function's log. Remove `BACKUP_EMAIL` to stop it. The code is in `netlify/functions/monthly-backup.ts`.
+
+For automatic daily backups, upgrade the Supabase project to Pro.
 
 ## 3. Set up email (Nodemailer + a dedicated mailbox)
 

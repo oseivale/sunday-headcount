@@ -120,6 +120,16 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
         ))}
         <AddPersonForm roles={(Object.keys(ROLE_LABEL) as Role[]).map((r) => ({ value: r, label: ROLE_LABEL[r] }))} />
       </section>
+
+      <section className="panel">
+        <h2>Back up your data</h2>
+        <p className="hint" style={{ margin: '4px 0 10px' }}>
+          Download everything recorded in the app (Sundays, monthly records, reports, team, email list and change history) as a .zip of spreadsheet files.
+          The free database plan has no automatic backups, so download one every month or two and keep it somewhere private: it includes offering amounts and email addresses.
+        </p>
+        {/* A plain link (not next/link) so the file is only built when someone clicks. */}
+        <a href="/settings/export" className="btn" download>Export all data</a>
+      </section>
     </div>
   )
 }
