@@ -207,7 +207,7 @@ export function SundayForm({ date, existing, recent, canEdit, canEditEtransfer }
               <div className="moneypair">
                 {moneyBox('etransfer', 'CAD', 'E-transfer', canEditEtransfer)}
               </div>
-              <span className="hint">{canEditEtransfer ? 'Total e-transfers received for this Sunday.' : 'Entered by the pastor or an admin.'}</span>
+              <span className="hint">{canEditEtransfer ? 'Total e-transfers received for this Sunday.' : 'E-transfer amounts entered by the pastor or an admin.'}</span>
             </div>
             <div className="sumrow">
               <span>Total offering</span>

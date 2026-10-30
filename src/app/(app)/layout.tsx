@@ -29,17 +29,15 @@ export default async function AppLayout({ children }: Readonly<{ children: React
                   <circle cx="12" cy="8" r="4" />
                   <path d="M4 20c0-4 3.6-6.5 8-6.5s8 2.5 8 6.5" />
                 </svg>
-                <span className="hdrlabel">My account</span>
                 <span className="hdrshort" aria-hidden="true">My account</span>
               </Link>
               <form action="/auth/signout" method="post">
-                <button className="link hdrlink" aria-label="Sign out" title="Sign out">
+                <button className="link hdrlink" aria-label="Log out" title="Log out">
                   <svg className="hdricon" viewBox="0 0 24 24" aria-hidden="true">
                     <path d="M14 4h4a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-4" />
                     <path d="M10 8l-4 4 4 4" />
                     <path d="M6 12h10" />
                   </svg>
-                  <span className="hdrlabel">Sign out</span>
                   <span className="hdrshort" aria-hidden="true">Log out</span>
                 </button>
               </form>
